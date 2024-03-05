@@ -108,6 +108,9 @@ use crate::google::bigtable::v2::{
 use crate::google::bigtable::v2::{CheckAndMutateRowRequest, CheckAndMutateRowResponse};
 use crate::{root_ca_certificate, util::get_end_key};
 
+#[cfg(feature = "gzip")]
+use tonic::codec::CompressionEncoding;
+
 pub mod read_rows;
 
 /// An alias for Vec<u8> as row key
@@ -429,7 +432,16 @@ fn create_client(
     let auth_svc = ServiceBuilder::new()
         .layer_fn(|c| AuthSvc::new(c, token_provider.clone(), scopes.to_string()))
         .service(channel);
-    return BigtableClient::new(auth_svc);
+
+    #[allow(clippy::let_and_return)]
+    let client = BigtableClient::new(auth_svc);
+
+    #[cfg(feature = "gzip")]
+    let client = client
+        .send_compressed(CompressionEncoding::Gzip)
+        .accept_compressed(CompressionEncoding::Gzip);
+
+    client
 }
 
 /// The core struct for Bigtable client, which wraps a gPRC client defined by Bigtable proto.
