@@ -2,35 +2,43 @@ use crate::bigtable::{Error, Result, RowCell, RowKey};
 use crate::google::bigtable::v2::read_rows_response::cell_chunk::RowStatus;
 use crate::google::bigtable::v2::read_rows_response::CellChunk;
 use crate::google::bigtable::v2::ReadRowsResponse;
+use futures_util::{Stream, TryStreamExt};
 use log::trace;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tonic::Streaming;
 
 /// As each `CellChunk` could be only part of a cell, this method reorganize multiple `CellChunk`
-/// from multiple `ReadRowsResponse` into a `Vec<(RowKey, Vec<RowCell>)>`.
-pub async fn decode_read_rows_response(
-    timeout: &Option<Duration>,
+/// from multiple `ReadRowsResponse` into a strean of `(RowKey, Vec<RowCell>)`.
+pub fn decode_read_rows_response_stream(
+    timeout: Option<Duration>,
     mut rrr: Streaming<ReadRowsResponse>,
-) -> Result<Vec<(RowKey, Vec<RowCell>)>> {
-    let mut rows: Vec<(RowKey, Vec<RowCell>)> = vec![];
-
-    let started = Instant::now();
-    while let Some(res) = rrr.message().await? {
-        if let Some(timeout) = timeout.as_ref() {
-            if Instant::now().duration_since(started) > *timeout {
-                return Err(Error::TimeoutError(timeout.as_secs()));
+) -> impl Stream<Item = Result<(RowKey, Vec<RowCell>)>> {
+    async_stream::try_stream! {
+        let started = Instant::now();
+        while let Some(res) = rrr.message().await? {
+            if let Some(timeout) = timeout.as_ref() {
+                if Instant::now().duration_since(started) > *timeout {
+                    Err(Error::TimeoutError(timeout.as_secs()))?;
+                }
             }
-        }
-        let rows_part = decode_read_rows_response_to_vec(res.chunks);
-        for part in rows_part.into_iter() {
-            match part {
-                Ok(part) => rows.push(part),
-                Err(e) => return Err(e),
+            let rows_part = decode_read_rows_response_to_vec(res.chunks);
+            for part in rows_part.into_iter() {
+                yield part?;
             }
         }
     }
-    Ok(rows)
+}
+
+/// As each `CellChunk` could be only part of a cell, this method reorganize multiple `CellChunk`
+/// from multiple `ReadRowsResponse` into a `Vec<(RowKey, Vec<RowCell>)>`.
+pub async fn decode_read_rows_response(
+    timeout: &Option<Duration>,
+    rrr: Streaming<ReadRowsResponse>,
+) -> Result<Vec<(RowKey, Vec<RowCell>)>> {
+    decode_read_rows_response_stream(*timeout, rrr)
+        .try_collect()
+        .await
 }
 
 pub fn decode_read_rows_response_to_vec(
