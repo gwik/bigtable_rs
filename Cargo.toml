@@ -1,4 +1,7 @@
 [workspace]
+
+resolver = "2"
+
 members = [
     "bigtable_rs",
     # Non-published crates
