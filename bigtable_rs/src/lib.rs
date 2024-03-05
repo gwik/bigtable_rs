@@ -13,10 +13,6 @@ pub mod google;
 mod root_ca_certificate;
 mod util;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+pub mod reexports {
+    pub use tonic;
 }
