@@ -1,3 +1,4 @@
+#![warn(rustdoc::broken_intra_doc_links)]
 //!
 //! A simple Google Bigtable client.
 //!
@@ -13,6 +14,7 @@ pub mod google;
 mod root_ca_certificate;
 mod util;
 
+/// Reexported dependencies for convenience.
 pub mod reexports {
     pub use tonic;
 }

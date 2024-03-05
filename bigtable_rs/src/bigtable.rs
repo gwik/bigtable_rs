@@ -89,6 +89,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use futures_util::{Stream, TryStreamExt};
 use gcp_auth::AuthenticationManager;
 use log::info;
 use thiserror::Error;
@@ -108,6 +109,8 @@ use crate::{root_ca_certificate, util::get_end_key};
 
 #[cfg(feature = "gzip")]
 use tonic::codec::CompressionEncoding;
+
+use self::read_rows::decode_read_rows_response_stream;
 
 pub mod read_rows;
 
@@ -374,13 +377,34 @@ impl BigTable {
         decode_read_rows_response(self.timeout.as_ref(), response).await
     }
 
+    /// Streaming version of [BigTable::read_rows].
+    pub async fn read_rows_stream(
+        &mut self,
+        request: ReadRowsRequest,
+    ) -> Result<impl Stream<Item = Result<(RowKey, Vec<RowCell>)>>> {
+        let response = self.client.read_rows(request).await?.into_inner();
+        Ok(decode_read_rows_response_stream(*self.timeout, response))
+    }
+
     /// Provide `read_rows_with_prefix` method to allow using a prefix as key
     pub async fn read_rows_with_prefix(
         &mut self,
-        mut request: ReadRowsRequest,
+        request: ReadRowsRequest,
         prefix: Vec<u8>,
     ) -> Result<Vec<(RowKey, Vec<RowCell>)>> {
-        let end_key = get_end_key(prefix.as_ref()).map(|end_key| EndKey::EndKeyOpen(end_key));
+        self.read_rows_with_prefix_stream(request, prefix)
+            .await?
+            .try_collect()
+            .await
+    }
+
+    /// Streaming version of [BigTable::read_rows_with_prefix].
+    pub async fn read_rows_with_prefix_stream(
+        &mut self,
+        mut request: ReadRowsRequest,
+        prefix: Vec<u8>,
+    ) -> Result<impl Stream<Item = Result<(RowKey, Vec<RowCell>)>>> {
+        let end_key = get_end_key(prefix.as_ref()).map(EndKey::EndKeyOpen);
         request.rows = Some(RowSet {
             row_keys: vec![], // use this field to put keys for reading specific rows
             row_ranges: vec![RowRange {
@@ -389,7 +413,7 @@ impl BigTable {
             }],
         });
         let response = self.client.read_rows(request).await?.into_inner();
-        decode_read_rows_response(self.timeout.as_ref(), response).await
+        Ok(decode_read_rows_response_stream(*self.timeout, response))
     }
 
     /// Wrapped `sample_row_keys` method
