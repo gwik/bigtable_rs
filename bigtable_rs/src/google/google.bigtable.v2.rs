@@ -376,16 +376,22 @@ pub mod row_filter {
         /// If `predicate_filter` outputs any cells, then `true_filter` will be
         /// evaluated on the input row. Otherwise, `false_filter` will be evaluated.
         #[prost(message, optional, boxed, tag = "1")]
-        pub predicate_filter: ::core::option::Option<::prost::alloc::boxed::Box<super::RowFilter>>,
+        pub predicate_filter: ::core::option::Option<
+            ::prost::alloc::boxed::Box<super::RowFilter>,
+        >,
         /// The filter to apply to the input row if `predicate_filter` returns any
         /// results. If not provided, no results will be returned in the true case.
         #[prost(message, optional, boxed, tag = "2")]
-        pub true_filter: ::core::option::Option<::prost::alloc::boxed::Box<super::RowFilter>>,
+        pub true_filter: ::core::option::Option<
+            ::prost::alloc::boxed::Box<super::RowFilter>,
+        >,
         /// The filter to apply to the input row if `predicate_filter` does not
         /// return any results. If not provided, no results will be returned in the
         /// false case.
         #[prost(message, optional, boxed, tag = "3")]
-        pub false_filter: ::core::option::Option<::prost::alloc::boxed::Box<super::RowFilter>>,
+        pub false_filter: ::core::option::Option<
+            ::prost::alloc::boxed::Box<super::RowFilter>,
+        >,
     }
     /// Which of the possible RowFilter types to apply. If none are set, this
     /// RowFilter returns all cells in the input row.
@@ -910,7 +916,17 @@ pub mod read_rows_request {
     #[serde_with::serde_as]
     #[derive(serde::Serialize, serde::Deserialize)]
     #[serde(rename_all = "camelCase")]
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[derive(
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord,
+        ::prost::Enumeration
+    )]
     #[repr(i32)]
     pub enum RequestStatsView {
         /// The default / unset value. The API will default to the NONE option below.
@@ -1578,7 +1594,9 @@ pub mod read_change_stream_response {
         /// an example usage see
         /// <https://beam.apache.org/documentation/basics/#watermarks>
         #[prost(message, optional, tag = "10")]
-        pub estimated_low_watermark: ::core::option::Option<::prost_wkt_types::Timestamp>,
+        pub estimated_low_watermark: ::core::option::Option<
+            ::prost_wkt_types::Timestamp,
+        >,
     }
     /// Nested message and enum types in `DataChange`.
     pub mod data_change {
@@ -1587,7 +1605,15 @@ pub mod read_change_stream_response {
         #[derive(serde::Serialize, serde::Deserialize)]
         #[serde(rename_all = "camelCase")]
         #[derive(
-            Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration,
+            Clone,
+            Copy,
+            Debug,
+            PartialEq,
+            Eq,
+            Hash,
+            PartialOrd,
+            Ord,
+            ::prost::Enumeration
         )]
         #[repr(i32)]
         pub enum Type {
@@ -1645,7 +1671,9 @@ pub mod read_change_stream_response {
         /// an example usage see
         /// <https://beam.apache.org/documentation/basics/#watermarks>
         #[prost(message, optional, tag = "2")]
-        pub estimated_low_watermark: ::core::option::Option<::prost_wkt_types::Timestamp>,
+        pub estimated_low_watermark: ::core::option::Option<
+            ::prost_wkt_types::Timestamp,
+        >,
     }
     /// A message indicating that the client should stop reading from the stream.
     /// If status is OK and `continuation_tokens` & `new_partitions` are empty, the
@@ -1679,7 +1707,9 @@ pub mod read_change_stream_response {
         /// If non-empty, contains the information needed to resume reading their
         /// associated partitions.
         #[prost(message, repeated, tag = "2")]
-        pub continuation_tokens: ::prost::alloc::vec::Vec<super::StreamContinuationToken>,
+        pub continuation_tokens: ::prost::alloc::vec::Vec<
+            super::StreamContinuationToken,
+        >,
         /// If non-empty, contains the new partitions to start reading from, which
         /// are related to but not necessarily identical to the partitions for the
         /// above `continuation_tokens`.
@@ -1707,8 +1737,8 @@ pub mod read_change_stream_response {
 /// Generated client implementations.
 pub mod bigtable_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::http::Uri;
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     /// Service for reading from and writing to existing Bigtable tables.
     #[derive(Debug, Clone)]
     pub struct BigtableClient<T> {
@@ -1753,8 +1783,9 @@ pub mod bigtable_client {
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
-                Into<StdError> + Send + Sync,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
         {
             BigtableClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -1801,15 +1832,19 @@ pub mod bigtable_client {
             tonic::Response<tonic::codec::Streaming<super::ReadRowsResponse>>,
             tonic::Status,
         > {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/google.bigtable.v2.Bigtable/ReadRows");
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.bigtable.v2.Bigtable/ReadRows",
+            );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("google.bigtable.v2.Bigtable", "ReadRows"));
@@ -1826,20 +1861,22 @@ pub mod bigtable_client {
             tonic::Response<tonic::codec::Streaming<super::SampleRowKeysResponse>>,
             tonic::Status,
         > {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/google.bigtable.v2.Bigtable/SampleRowKeys");
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.bigtable.v2.Bigtable/SampleRowKeys",
+            );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "SampleRowKeys",
-            ));
+            req.extensions_mut()
+                .insert(GrpcMethod::new("google.bigtable.v2.Bigtable", "SampleRowKeys"));
             self.inner.server_streaming(req, path, codec).await
         }
         /// Mutates a row atomically. Cells already present in the row are left
@@ -1847,16 +1884,23 @@ pub mod bigtable_client {
         pub async fn mutate_row(
             &mut self,
             request: impl tonic::IntoRequest<super::MutateRowRequest>,
-        ) -> std::result::Result<tonic::Response<super::MutateRowResponse>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::MutateRowResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/google.bigtable.v2.Bigtable/MutateRow");
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.bigtable.v2.Bigtable/MutateRow",
+            );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("google.bigtable.v2.Bigtable", "MutateRow"));
@@ -1872,15 +1916,19 @@ pub mod bigtable_client {
             tonic::Response<tonic::codec::Streaming<super::MutateRowsResponse>>,
             tonic::Status,
         > {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/google.bigtable.v2.Bigtable/MutateRows");
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.bigtable.v2.Bigtable/MutateRows",
+            );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("google.bigtable.v2.Bigtable", "MutateRows"));
@@ -1890,23 +1938,28 @@ pub mod bigtable_client {
         pub async fn check_and_mutate_row(
             &mut self,
             request: impl tonic::IntoRequest<super::CheckAndMutateRowRequest>,
-        ) -> std::result::Result<tonic::Response<super::CheckAndMutateRowResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::CheckAndMutateRowResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.bigtable.v2.Bigtable/CheckAndMutateRow",
             );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "CheckAndMutateRow",
-            ));
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("google.bigtable.v2.Bigtable", "CheckAndMutateRow"),
+                );
             self.inner.unary(req, path, codec).await
         }
         /// Warm up associated instance metadata for this connection.
@@ -1914,22 +1967,26 @@ pub mod bigtable_client {
         pub async fn ping_and_warm(
             &mut self,
             request: impl tonic::IntoRequest<super::PingAndWarmRequest>,
-        ) -> std::result::Result<tonic::Response<super::PingAndWarmResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::PingAndWarmResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/google.bigtable.v2.Bigtable/PingAndWarm");
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.bigtable.v2.Bigtable/PingAndWarm",
+            );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "PingAndWarm",
-            ));
+            req.extensions_mut()
+                .insert(GrpcMethod::new("google.bigtable.v2.Bigtable", "PingAndWarm"));
             self.inner.unary(req, path, codec).await
         }
         /// Modifies a row atomically on the server. The method reads the latest
@@ -1940,23 +1997,28 @@ pub mod bigtable_client {
         pub async fn read_modify_write_row(
             &mut self,
             request: impl tonic::IntoRequest<super::ReadModifyWriteRowRequest>,
-        ) -> std::result::Result<tonic::Response<super::ReadModifyWriteRowResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::ReadModifyWriteRowResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.bigtable.v2.Bigtable/ReadModifyWriteRow",
             );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "ReadModifyWriteRow",
-            ));
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("google.bigtable.v2.Bigtable", "ReadModifyWriteRow"),
+                );
             self.inner.unary(req, path, codec).await
         }
         /// NOTE: This API is intended to be used by Apache Beam BigtableIO.
@@ -1965,28 +2027,38 @@ pub mod bigtable_client {
         /// Partitions can be read with `ReadChangeStream`.
         pub async fn generate_initial_change_stream_partitions(
             &mut self,
-            request: impl tonic::IntoRequest<super::GenerateInitialChangeStreamPartitionsRequest>,
+            request: impl tonic::IntoRequest<
+                super::GenerateInitialChangeStreamPartitionsRequest,
+            >,
         ) -> std::result::Result<
             tonic::Response<
-                tonic::codec::Streaming<super::GenerateInitialChangeStreamPartitionsResponse>,
+                tonic::codec::Streaming<
+                    super::GenerateInitialChangeStreamPartitionsResponse,
+                >,
             >,
             tonic::Status,
         > {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.bigtable.v2.Bigtable/GenerateInitialChangeStreamPartitions",
             );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "GenerateInitialChangeStreamPartitions",
-            ));
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "google.bigtable.v2.Bigtable",
+                        "GenerateInitialChangeStreamPartitions",
+                    ),
+                );
             self.inner.server_streaming(req, path, codec).await
         }
         /// NOTE: This API is intended to be used by Apache Beam BigtableIO.
@@ -2000,21 +2072,24 @@ pub mod bigtable_client {
             tonic::Response<tonic::codec::Streaming<super::ReadChangeStreamResponse>>,
             tonic::Status,
         > {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.bigtable.v2.Bigtable/ReadChangeStream",
             );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "google.bigtable.v2.Bigtable",
-                "ReadChangeStream",
-            ));
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("google.bigtable.v2.Bigtable", "ReadChangeStream"),
+                );
             self.inner.server_streaming(req, path, codec).await
         }
     }

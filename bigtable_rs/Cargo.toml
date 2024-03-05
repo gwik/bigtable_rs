@@ -18,7 +18,7 @@ gzip = ["tonic/gzip"]
 [dependencies]
 # tonic, prost, and prost-types are need for build generated rs files
 http = "0.2"
-tonic = { version = "0.10", features = ["tls", "transport"] }
+tonic = { version = "0.11", features = ["tls", "transport"] }
 tower = { version = "0.4" }
 prost = "0.12"
 prost-wkt-types = "0.5"
@@ -39,6 +39,6 @@ prost-types = "0.12"
 prost-wkt = "0.5"
 
 [build-dependencies]
-tonic-build = { version = "0.10.1", features = ["cleanup-markdown"]}
-prost-build = "0.12.2"
-prost-wkt-build = "0.5.0"
+tonic-build = { version = "0.11", features = ["cleanup-markdown"]}
+prost-build = "0.12"
+prost-wkt-build = "0.5"
