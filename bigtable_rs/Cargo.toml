@@ -11,6 +11,10 @@ readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+gzip = ["tonic/gzip"]
+
 [dependencies]
 # tonic, prost, and prost-types are need for build generated rs files
 http = "1.1.0"
@@ -33,6 +37,9 @@ thiserror = "1.0.50"
 env_logger = "0.11.1"
 serde_json = "1.0.85"
 serde_path_to_error = "0.1.8"
+# seems unused
+prost-types = "0.12"
+prost-wkt = "0.5"
 
 [build-dependencies]
 tonic-build = { version = "0.12.2", features = ["cleanup-markdown"] }
