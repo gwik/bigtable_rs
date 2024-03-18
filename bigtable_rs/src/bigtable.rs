@@ -89,7 +89,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use futures_util::{Stream, TryStreamExt};
+use futures_util::{Stream, StreamExt, TryStreamExt};
 use gcp_auth::AuthenticationManager;
 use log::info;
 use thiserror::Error;
@@ -381,7 +381,7 @@ impl BigTable {
     pub async fn read_rows_stream(
         &mut self,
         request: ReadRowsRequest,
-    ) -> Result<impl Stream<Item = Result<(RowKey, Vec<RowCell>)>>> {
+    ) -> Result<impl Stream<Item = Result<Vec<(RowKey, Vec<RowCell>)>>>> {
         let response = self.client.read_rows(request).await?.into_inner();
         Ok(decode_read_rows_response_stream(*self.timeout, response))
     }
@@ -394,6 +394,8 @@ impl BigTable {
     ) -> Result<Vec<(RowKey, Vec<RowCell>)>> {
         self.read_rows_with_prefix_stream(request, prefix)
             .await?
+            .map_ok(|v| futures_util::stream::iter(v).map(Result::Ok))
+            .try_flatten()
             .try_collect()
             .await
     }
@@ -403,7 +405,7 @@ impl BigTable {
         &mut self,
         mut request: ReadRowsRequest,
         prefix: Vec<u8>,
-    ) -> Result<impl Stream<Item = Result<(RowKey, Vec<RowCell>)>>> {
+    ) -> Result<impl Stream<Item = Result<Vec<(RowKey, Vec<RowCell>)>>>> {
         let end_key = get_end_key(prefix.as_ref()).map(EndKey::EndKeyOpen);
         request.rows = Some(RowSet {
             row_keys: vec![], // use this field to put keys for reading specific rows

@@ -2,7 +2,7 @@ use crate::bigtable::{Error, Result, RowCell, RowKey};
 use crate::google::bigtable::v2::read_rows_response::cell_chunk::RowStatus;
 use crate::google::bigtable::v2::read_rows_response::CellChunk;
 use crate::google::bigtable::v2::ReadRowsResponse;
-use futures_util::{Stream, TryStreamExt};
+use futures_util::{Stream, StreamExt, TryStreamExt};
 use log::trace;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
@@ -13,7 +13,7 @@ use tonic::Streaming;
 pub fn decode_read_rows_response_stream(
     timeout: Option<Duration>,
     mut rrr: Streaming<ReadRowsResponse>,
-) -> impl Stream<Item = Result<(RowKey, Vec<RowCell>)>> {
+) -> impl Stream<Item = Result<Vec<(RowKey, Vec<RowCell>)>>> {
     async_stream::try_stream! {
         let started = Instant::now();
         while let Some(res) = rrr.message().await? {
@@ -22,10 +22,8 @@ pub fn decode_read_rows_response_stream(
                     Err(Error::TimeoutError(timeout.as_secs()))?;
                 }
             }
-            let rows_part = decode_read_rows_response_to_vec(res.chunks);
-            for part in rows_part.into_iter() {
-                yield part?;
-            }
+            let rows_part = decode_read_rows_response_to_vec(res.chunks).into_iter().collect::<Result<Vec<_>>>()?;
+            yield rows_part;
         }
     }
 }
@@ -37,6 +35,8 @@ pub async fn decode_read_rows_response(
     rrr: Streaming<ReadRowsResponse>,
 ) -> Result<Vec<(RowKey, Vec<RowCell>)>> {
     decode_read_rows_response_stream(*timeout, rrr)
+        .map_ok(|v| futures_util::stream::iter(v).map(Result::Ok))
+        .try_flatten()
         .try_collect()
         .await
 }
